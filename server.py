@@ -26,7 +26,7 @@ def predict():
     prediction = model.predict(input_data)
     prediction_number = prediction[0][0]  
 
-    return jsonify({'prediction': math.round(prediction_number)})
+    return str(prediction_number)
 
 if __name__ == '__main__':
     app.run(debug=True)
