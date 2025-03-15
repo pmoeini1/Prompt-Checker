@@ -66,6 +66,25 @@ def falsePositive():
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         return jsonify(error=str(e)), 500
+    
+@app.route('/getFN', methods=['GET'])
+def getFN():
+    documents = db['falseNegative'].find()
+    results = []
+    for doc in documents:
+        doc['_id'] = str(doc['_id'])  # Convert ObjectId to string
+        results.append(doc)
+    return jsonify(results)
+
+@app.route('/getFP', methods=['GET'])
+def getFP():
+    documents = db['falsePositive'].find()
+    results = []
+    for doc in documents:
+        doc['_id'] = str(doc['_id'])  # Convert ObjectId to string
+        results.append(doc)
+    print(jsonify(results))
+    return jsonify(results)
 
 if __name__ == '__main__':
     app.run(debug=True)
