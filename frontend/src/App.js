@@ -6,10 +6,8 @@ import axios from 'axios'
 function App() {
   const [data, setData] = React.useState("");
   const [output, setOutput] = React.useState("")
+  const [text, setText] = React.useState("");
 
-  React.useEffect(() => {
-    console.log(output)
-  }, [output])
   
   return (
     <div className="App">
@@ -19,11 +17,13 @@ function App() {
         {data && <button onClick={() => {
           axios.post('http://localhost:5000/predict', {input_string: data})
             .then((res) => {
-              setOutput(res.data);
+              setOutput(res?.data?.prediction);
+              setText(res?.data?.output);
             })
             .catch((err) => {console.log(err); alert("Error, please try again later.");})
         }}>Predict</button>}
         {output && <h3>Prediction: {output<0.5? "Not malicious" : "Malicious"}</h3>}
+        {text && <h3>Response: {text}</h3>}
         {output && <button onClick={() => {
           axios.post('http://localhost:5000/falsePositive', {input_string: data})
           .then((res) => {alert("Reporting false positive for: " + data);})

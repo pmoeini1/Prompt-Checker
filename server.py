@@ -50,7 +50,7 @@ def predict():
     inputs = LLMtokenizer(prompt_string, return_tensors="pt")
     output = LLMmodel.generate(**inputs, max_new_tokens=80, pad_token_id=tokenizer.eos_token_id)
 
-    return jsonify({"pred": prediction_number, "response": output})
+    return jsonify({"prediction": prediction_number, "output": output})
 
 @app.route('/falseNegative', methods=['POST'])
 def falseNegative():
