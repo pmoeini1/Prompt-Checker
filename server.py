@@ -6,6 +6,12 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from flask_cors import CORS
 import logging
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+model_path = "distilgpt2-malicious-detector"
+
+LLMtokenizer = AutoTokenizer.from_pretrained(model_path)
+LLMmodel = AutoModelForCausalLM.from_pretrained(model_path)
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -32,8 +38,19 @@ def predict():
 
     prediction = model.predict(input_data)
     prediction_number = prediction[0][0]  
+    CONTEXT = "You are a model designed to return 'Unsafe text, cannot respond' when provided with a malicious string of text: "
 
-    return str(prediction_number)
+    prompt_string = (
+        "<|system|>\n"
+        f"{CONTEXT}\n"
+        "<|user|>\n"
+        f"{input_string}"
+        "<|assistant|>\n"
+    )
+    inputs = LLMtokenizer(prompt_string, return_tensors="pt")
+    output = LLMmodel.generate(**inputs, max_new_tokens=80, pad_token_id=tokenizer.eos_token_id)
+
+    return jsonify({"pred": prediction_number, "response": output})
 
 @app.route('/falseNegative', methods=['POST'])
 def falseNegative():
